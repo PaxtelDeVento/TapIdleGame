@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:tapidlegame/views/home_screen.dart';
 
 // Supondo que você tenha um objeto globalDiamonds para gerenciar os dados dos diamantes
-import 'package:tapidlegame/services/api_service.dart'; // Importe seu serviço API
+// Importe seu serviço API
 
 class DiamondsProvider with ChangeNotifier {
   double _diamonds = 0;
@@ -21,8 +21,6 @@ class DiamondsProvider with ChangeNotifier {
 
   // Inicializa os dados de diamantes utilizando o fetch da API
   Future<void> _initializeDiamonds() async {
-    await ApiService().getDiamondsById(1); // Carrega os dados globais
-
     if (stats != null) {
       _diamonds = stats!.diamonds;
       _diamondsPerSecond = stats!.diamondsPerSecond;
@@ -68,6 +66,20 @@ class DiamondsProvider with ChangeNotifier {
 
   void increaseDiamondsPerSecond(double amount) {
     _diamondsPerSecond += amount;
+    notifyListeners();
+  }
+
+  void clearDiamonds() {
+    _diamondsPerSecond = 0;
+    _diamondsPerTap = 1;
+    _diamonds = 0;
+    notifyListeners();
+  }
+
+  void update() {
+    _diamonds = stats!.diamonds;
+    _diamondsPerSecond = stats!.diamondsPerSecond;
+    _diamondsPerTap = stats!.diamondsPerTap;
     notifyListeners();
   }
 }

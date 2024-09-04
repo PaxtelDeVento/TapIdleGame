@@ -1,3 +1,6 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:convert';
+
 class Upgrades {
   int id;                    // Id do upgrade
   String name;               // Nome do upgrade
@@ -26,23 +29,22 @@ class Upgrades {
   // Método para criar um objeto Upgrade a partir de um Map (como de um banco de dados)
   factory Upgrades.fromMap(Map<String, dynamic> map) {
     return Upgrades(
-      id: map['id'],
-      name: map['name'],
-      description: map['description'],
-      cost: map['cost'],
-      cost_increment: map['cost_increment'],
-      amount: map['amount'],
-      modifier: map['modifier'],
-      diamonds_increment: map['diamonds_increment'],
-      type: map['type']
-  
+      id: map['id'] as int,
+      name: map['name'] as String,
+      description: map['description'] as String,
+      cost: map['cost'] as int,
+      cost_increment: map['cost_increment'] as int,
+      amount: map['amount'] as int,
+      modifier: map['modifier'] as String,
+      diamonds_increment: (map['diamonds_increment'] as num).toDouble(),
+      type: map['type'] as String,
     );
   }
 
   // Método para converter um objeto Upgrade em um Map (como para salvar em um banco de dados)
   Map<String, dynamic> toMap() {
-    return {
-      'id' : id,
+    return <String, dynamic>{
+      'id': id,
       'name': name,
       'description': description,
       'cost': cost,
@@ -50,9 +52,11 @@ class Upgrades {
       'amount': amount,
       'modifier': modifier,
       'diamonds_increment': diamonds_increment,
-      'type' : type
+      'type': type,
     };
   }
 
+  String toJson() => json.encode(toMap());
 
+  factory Upgrades.fromJson(String source) => Upgrades.fromMap(json.decode(source) as Map<String, dynamic>);
 }

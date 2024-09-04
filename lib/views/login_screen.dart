@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:tapidlegame/models/diamonds_model.dart';
 import 'package:tapidlegame/models/user_model.dart';
+import 'package:tapidlegame/providers/diamonds_provider.dart';
 import 'package:tapidlegame/services/api_service.dart';
 import 'package:tapidlegame/views/home_screen.dart';
 import 'package:tapidlegame/views/register_screen.dart';
+import 'package:tapidlegame/views/upgrades_screen.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -16,12 +20,14 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
 
-  void getDiamonds() async{
-    await ApiService().getDiamondsById(user!.userId);
-  }
+  // Future<Diamonds?> getDiamonds(int? userId) async {
+  //   return await ApiService().getDiamondsById(userId);
+  // }
 
   @override
   Widget build(BuildContext context) {
+    final diamondsProvider = Provider.of<DiamondsProvider>(context);
+
     return Scaffold(
       body: Center(
         child: Padding(
@@ -63,16 +69,19 @@ class _LoginPageState extends State<LoginPage> {
                     },
                   ),
                 ),
-                obscureText: true,
+                obscureText: !_isPasswordVisible,
               ),
               const SizedBox(height: 32.0),
               ElevatedButton(
                 onPressed: () async {
-                  bool a = await ApiService().VerifyLogin(
-                      _emailController.text, _passwordController.text) as bool;
-                      getDiamonds();
-                  if (a) {
-                    
+                  User? a = await ApiService().VerifyLogin(
+                      _emailController.text, _passwordController.text);
+
+                  if (a != null) {
+                    user = a;
+                    stats = await ApiService().getDiamondsById(a.userId);
+                    upgrades = await ApiService().getUpgradesById(a.userId);
+                    diamondsProvider.update();
                     Navigator.of(context).pushReplacement(MaterialPageRoute(
                         builder: (context) => const MyHomePage(
                               title: 'Tap Idle Game',

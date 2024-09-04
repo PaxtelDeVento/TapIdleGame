@@ -1,15 +1,13 @@
 import 'dart:convert';
-import 'dart:ffi';
 import 'package:http/http.dart' as http;
 import 'package:tapidlegame/models/diamonds_model.dart';
+import 'package:tapidlegame/models/upgrades_model.dart';
 import 'package:tapidlegame/models/user_model.dart';
-import 'package:tapidlegame/views/home_screen.dart';
-import 'package:tapidlegame/views/login_screen.dart';
 
 class ApiService {
   final String baseUrl = 'http://192.168.3.19:5151/api';
 
-  Future<User?> getUser(String email) async {
+  Future<User?> getUserByEmail(String email) async {
     final url = Uri.parse('$baseUrl/User/$email');
     final response = await http.get(url);
 
@@ -23,6 +21,7 @@ class ApiService {
     } on Exception catch (e) {
       print(e);
     }
+    return null;
   }
 
   Future<bool> createUser(
@@ -56,31 +55,32 @@ class ApiService {
             'diamondsPerSecond': 0,
           }));
 
-      return response.statusCode == 201;
+      return response.statusCode == 200;
     } on Exception catch (e) {
       print(e);
       return false;
     }
   }
 
-  Future<Diamonds?> getDiamondsById(int userId) async {
+  Future<Diamonds?> getDiamondsById(int? userId) async {
     final url = Uri.parse('$baseUrl/Diamonds/$userId');
 
     try {
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
-        stats = Diamonds.fromJson(response.body);
+        return Diamonds.fromJson(response.body);
       } else {
-        print('Erro ao buscar diamantes: ${response.statusCode}'); 
+        print('Erro ao buscar diamantes: ${response.statusCode}');
         return null;
       }
     } on Exception catch (e) {
       print(e);
     }
+    return null;
   }
 
-  Future<bool?> VerifyLogin(String email, String senha) async {
+  Future<User?> VerifyLogin(String email, String senha) async {
     final url = Uri.parse('$baseUrl/User/login');
     try {
       final response = await http.post(url,
@@ -90,13 +90,66 @@ class ApiService {
             'password': senha,
           }));
       if (response.statusCode == 200) {
-        user = User.fromJson(response.body);
-        return true;
+        return User.fromJson(response.body);
       } else {
-        return false;
+        return null;
       }
     } on Exception catch (e) {
       print(e);
+    }
+    return null;
+  }
+
+  Future<void> updateDiamonds(Diamonds diamonds) async {
+    final url = Uri.parse('$baseUrl/Diamonds');
+
+    final response = await http.put(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'id': diamonds.id,
+        'userId': diamonds.userId,
+        'diamonds': diamonds.diamonds,
+        'diamondsPerTap': diamonds.diamondsPerTap,
+        'diamondsPerSecond': diamonds.diamondsPerSecond,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print('Diamantes atualizados com sucesso!');
+    } else {
+      print('Erro ao atualizar diamantes: ${response.statusCode}');
+    }
+  }
+
+  Future<List<Upgrades>?> getUpgradesById(int? userId) async {
+    final url = Uri.parse('$baseUrl/Upgrades/$userId');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      List<dynamic> a = json.decode(response.body);
+      return a.map((element) => Upgrades.fromMap(element)).toList();
+    } else {
+      return null;
+    }
+  }
+
+  Future<void> updateUpgrades(List<Upgrades?>? upgrades, int? userId) async {
+    final url = Uri.parse('$baseUrl/Upgrades/$userId');
+
+    List<Map<String, dynamic>?> upgradesJson =
+        upgrades!.map((upgrade) => upgrade?.toMap()).toList();
+
+    final response = await http.put(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(upgradesJson),
+    );
+
+    if (response.statusCode == 200) {
+      print('Upgrades atualizados com sucesso!');
+    } else {
+      print('Erro ao atualizar upgrades: ${response.statusCode}');
     }
   }
 }

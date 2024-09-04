@@ -2,8 +2,8 @@
 import 'dart:convert';
 
 class Diamonds {
-  int id;
-  int userId;
+  int? id;
+  int? userId;
   double diamonds; // Quantidade total de diamantes
   double diamondsPerTap; // Quantidade de diamantes ganhos por clique
   double diamondsPerSecond; // Quantidade de diamantes ganhos por segundo
@@ -12,6 +12,12 @@ class Diamonds {
   Diamonds({
     required this.id,
     required this.userId,
+    required this.diamonds,
+    required this.diamondsPerTap,
+    required this.diamondsPerSecond,
+  });
+
+    Diamonds.withoutId({
     required this.diamonds,
     required this.diamondsPerTap,
     required this.diamondsPerSecond,

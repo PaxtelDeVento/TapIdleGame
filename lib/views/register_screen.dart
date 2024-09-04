@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tapidlegame/models/diamonds_model.dart';
 import 'package:tapidlegame/models/user_model.dart';
 import 'package:tapidlegame/services/api_service.dart';
 import 'package:tapidlegame/views/home_screen.dart';
@@ -21,17 +22,21 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
 
-  Future<bool> createUser() async {
-    return await ApiService().createUser(
-        _nameController.text, _emailController.text, _passwordController.text);
+  // Future<void> createUser() async {
+  //   await ApiService().createUser(
+  //       _nameController.text, _emailController.text, _passwordController.text);
+  // }
+
+  Future<void> createDiamond(int? userId) async {
+    await ApiService().createDiamond(userId);
   }
 
   Future<User?> getUser() async {
-    return await ApiService().getUser(_emailController.text);
+    return await ApiService().getUserByEmail(_emailController.text);
   }
 
-  void createDiamonds(int? userId) async {
-    await ApiService().createDiamond(userId);
+  Future<Diamonds?> getDiamonds(int? userId) async {
+    return await ApiService().getDiamondsById(userId);
   }
 
   @override
@@ -114,35 +119,41 @@ class _RegisterPageState extends State<RegisterPage> {
               const SizedBox(height: 32.0),
               ElevatedButton(
                 onPressed: () async {
-                  if (!isValidPassword(_passwordController.text)) {
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text('Erro'),
-                        content: const Text(
-                            'A senha deve ter 8 ou mais dígitos, ao menos 1 letra maiúscula e 1 número'),
-                        actions: <Widget>[
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text('OK'),
-                          ),
-                        ],
-                      ),
-                    );
-                    return;
-                  }
+                  // if (!isValidPassword(_passwordController.text)) {
+                  //   showDialog(
+                  //     context: context,
+                  //     builder: (context) => AlertDialog(
+                  //       title: const Text('Erro'),
+                  //       content: const Text(
+                  //           'A senha deve ter 8 ou mais dígitos, ao menos 1 letra maiúscula e 1 número'),
+                  //       actions: <Widget>[
+                  //         TextButton(
+                  //           onPressed: () {
+                  //             Navigator.of(context).pop();
+                  //           },
+                  //           child: const Text('OK'),
+                  //         ),
+                  //       ],
+                  //     ),
+                  //   );
+                  //   return;
+                  // }
                   if (_passwordController.text ==
                       _confirmPasswordController.text) {
-                    createUser();
-                    await ApiService().VerifyLogin(
+                    await ApiService().createUser(_nameController.text,
                         _emailController.text, _passwordController.text);
-                    createDiamonds(user!.userId);
+
+                    User? a = await ApiService()
+                        .getUserByEmail(_emailController.text);
+
+                    createDiamond(a!.userId);
+
+                    stats = await getDiamonds(user!.userId);
 
                     Navigator.of(context).pushReplacement(MaterialPageRoute(
-                      builder: (context) =>
-                          const MyHomePage(title: 'Tap Idle Game'),
+                      builder: (context) => const MyHomePage(
+                        title: 'Tap Idle Game',
+                      ),
                     ));
                   } else {
                     showDialog(

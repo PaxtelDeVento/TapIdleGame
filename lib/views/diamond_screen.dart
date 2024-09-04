@@ -37,8 +37,6 @@ class _DiamondsPageState extends State<DiamondsPage> {
             ElevatedButton(
               onPressed: () {
                 diamondsProvider.tap();
-                print(
-                    '${diamondsProvider.diamonds},${diamondsProvider.diamondsPerSecond},${diamondsProvider.diamondsPerTap},');
               },
               style: ElevatedButton.styleFrom(
                 padding:

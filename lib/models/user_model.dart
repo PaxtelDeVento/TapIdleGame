@@ -2,7 +2,7 @@
 import 'dart:convert';
 
 class User {
-  int userId;
+  int? userId;
   String username;
   String email;
   String password;
@@ -10,6 +10,12 @@ class User {
   // Construtor
   User({
     required this.userId,
+    required this.username,
+    required this.email,
+    required this.password,
+  });
+
+  User.withoutId({
     required this.username,
     required this.email,
     required this.password,
@@ -35,7 +41,15 @@ class User {
     };
   }
 
+  
+
   String toJson() => json.encode(toMap());
 
-  factory User.fromJson(String source) => User.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory User.fromJson(String source) =>
+      User.fromMap(json.decode(source) as Map<String, dynamic>);
+
+  @override
+  String toString() {
+    return 'User(userId: $userId, username: $username, email: $email, password: $password)';
+  }
 }
